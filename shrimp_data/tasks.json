@@ -1,0 +1,514 @@
+{
+  "tasks": [
+    {
+      "id": "0fe11122-b9fd-4596-9d5d-c236c16f416b",
+      "name": "[P1-1] 프로젝트 구조 및 사이트 설정 정리",
+      "description": "PRD 6.2절 기준 디렉토리를 만들고 스타터킷 흔적을 블로그용으로 정리한다. src/components/blog/, src/types/ 생성, src/app/examples/ 삭제, src/config/site.ts를 블로그 이름(Notion CMS Blog)·설명·내비게이션으로 변경, next.config.ts가 Turbopack 기본·cacheComponents 미사용 상태인지 확인.",
+      "notes": "내비게이션은 site.ts만 수정하면 헤더·모바일 내비에 자동 반영된다.",
+      "status": "pending",
+      "dependencies": [],
+      "createdAt": "2026-10-10T09:28:08.575Z",
+      "updatedAt": "2026-10-10T09:28:08.575Z",
+      "relatedFiles": [
+        {
+          "path": "src/config/site.ts",
+          "type": "TO_MODIFY",
+          "description": "사이트 설정"
+        },
+        {
+          "path": "src/app/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "홈 페이지(예제 링크 제거)"
+        },
+        {
+          "path": "src/app/examples/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "삭제 대상"
+        },
+        {
+          "path": "src/app/examples/component-showcase.tsx",
+          "type": "TO_MODIFY",
+          "description": "삭제 대상"
+        },
+        {
+          "path": "next.config.ts",
+          "type": "REFERENCE",
+          "description": "설정 확인"
+        }
+      ],
+      "implementationGuide": "1. feature/project-setup 브랜치 생성\\n2. mkdir src/components/blog src/types (빈 폴더는 .gitkeep)\\n3. src/app/examples/ 삭제 → site.ts mainNav의 '예제' 항목 제거, src/app/page.tsx의 /examples 링크 제거(홈은 임시 플레이스홀더로 단순화)\\n4. site.ts: name='Notion CMS Blog', description 블로그 소개, mainNav=[{홈,/}], links.github 유지\\n5. next.config.ts는 변경하지 않음(확인만)",
+      "verificationCriteria": "src/components/blog, src/types 존재. /examples 참조가 코드에 없음(grep). 헤더에 블로그 이름 표시. npm run lint, typecheck 통과.",
+      "analysisResult": "docs/ROADMAP.md의 Phase 1→2→3→4→5 순서를 엄격히 따라 Next.js 16.3.6 스타터킷을 Notion CMS 블로그로 전환한다. 모든 작업은 shrimp-rules.md를 준수한다(await params, PageProps 전역 타입, error.tsx retry, Base UI render prop, Notion 서버 전용, Status=발행됨 필터, 한국어 주석·커밋, feature/ 브랜치, lint/typecheck/build 통과). 각 Phase 마지막 작업은 ROADMAP 완료 기준 확인 및 체크박스 갱신을 포함한다."
+    },
+    {
+      "id": "fc98776b-759e-430d-a4d3-0ad262280d80",
+      "name": "[P1-2] Notion API 연동 환경 구축",
+      "description": "Notion SDK를 설치하고 서버 전용 클라이언트를 초기화한다. Notion Integration·DB 생성과 .env.local 값 입력은 사용자가 수행하며, 에이전트는 절차 안내와 코드만 담당한다.",
+      "notes": "NEXT_PUBLIC_ 접두사 금지. .env.local은 .gitignore의 .env* 규칙으로 제외됨을 확인.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "0fe11122-b9fd-4596-9d5d-c236c16f416b"
+        }
+      ],
+      "createdAt": "2026-10-10T09:28:08.575Z",
+      "updatedAt": "2026-10-10T09:28:08.575Z",
+      "relatedFiles": [
+        {
+          "path": "src/lib/notion.ts",
+          "type": "CREATE",
+          "description": "Notion 클라이언트"
+        },
+        {
+          "path": ".env.example",
+          "type": "REFERENCE",
+          "description": "환경 변수 키"
+        },
+        {
+          "path": ".gitignore",
+          "type": "REFERENCE",
+          "description": ".env 제외 확인"
+        },
+        {
+          "path": "package.json",
+          "type": "TO_MODIFY",
+          "description": "의존성 추가"
+        }
+      ],
+      "implementationGuide": "1. npm install @notionhq/client notion-to-md server-only\\n2. 설치된 @notionhq/client 버전의 README/타입에서 databases.query 또는 dataSources.query 중 어떤 API가 지원되는지 확인(추측 금지)\\n3. src/lib/notion.ts: import 'server-only'; 환경 변수 검증 함수 getNotionEnv() → 누락 시 명확한 한국어 에러 throw; export const notionClient = new Client({ auth })\\n4. 사용자 안내: Internal Integration 생성(읽기 권한), PRD 3장 속성(Title, Category, Tags, Published, Status, Slug, Description)으로 DB 생성, Integration 연결, 샘플 글 3건 이상(초안 1건 포함), .env.local에 NOTION_API_KEY/NOTION_DATABASE_ID 입력\\n5. .env.example은 이미 키가 있으므로 확인만",
+      "verificationCriteria": "패키지 설치됨. notion.ts가 server-only를 import. 서버 컴포넌트에서 DB 조회 요청 1회 성공(사용자 환경 변수 입력 후). git status에 .env.local 미노출.",
+      "analysisResult": "docs/ROADMAP.md의 Phase 1→2→3→4→5 순서를 엄격히 따라 Next.js 16.3.6 스타터킷을 Notion CMS 블로그로 전환한다. 모든 작업은 shrimp-rules.md를 준수한다(await params, PageProps 전역 타입, error.tsx retry, Base UI render prop, Notion 서버 전용, Status=발행됨 필터, 한국어 주석·커밋, feature/ 브랜치, lint/typecheck/build 통과). 각 Phase 마지막 작업은 ROADMAP 완료 기준 확인 및 체크박스 갱신을 포함한다."
+    },
+    {
+      "id": "399f18ea-9fed-407c-8c63-80706f2a4b70",
+      "name": "[P1-3] 블로그 기본 레이아웃 및 Phase 1 검증",
+      "description": "루트 레이아웃과 에러/404/로딩 화면을 블로그 문구로 정리하고, 본문용 최대 너비 컨테이너 규칙을 확정한다. Phase 1 완료 기준을 검증한다.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "fc98776b-759e-430d-a4d3-0ad262280d80"
+        }
+      ],
+      "createdAt": "2026-10-10T09:28:08.575Z",
+      "updatedAt": "2026-10-10T09:28:08.575Z",
+      "relatedFiles": [
+        {
+          "path": "src/app/layout.tsx",
+          "type": "TO_MODIFY",
+          "description": "루트 레이아웃"
+        },
+        {
+          "path": "src/app/error.tsx",
+          "type": "TO_MODIFY",
+          "description": "에러 UI"
+        },
+        {
+          "path": "src/app/not-found.tsx",
+          "type": "TO_MODIFY",
+          "description": "404 UI"
+        },
+        {
+          "path": "src/app/loading.tsx",
+          "type": "TO_MODIFY",
+          "description": "로딩 UI"
+        },
+        {
+          "path": "docs/ROADMAP.md",
+          "type": "TO_MODIFY",
+          "description": "체크박스 갱신"
+        }
+      ],
+      "implementationGuide": "1. layout.tsx: Header·Footer·ThemeProvider 배치 확인(변경 최소화)\\n2. 컨테이너: 페이지 container mx-auto max-w-6xl px-4, 본문 max-w-3xl 사용 규칙 유지\\n3. error.tsx(retry prop 유지), not-found.tsx('글을 찾을 수 없습니다' 등), loading.tsx 문구를 블로그용으로 수정\\n4. npm run lint && npm run typecheck && npm run build\\n5. ROADMAP Phase 1 체크박스 [x] 갱신 후 한국어 커밋",
+      "verificationCriteria": "npm run dev로 헤더·푸터가 있는 빈 홈 표시. lint/typecheck/build 통과. ROADMAP Phase 1 완료 기준 충족.",
+      "analysisResult": "docs/ROADMAP.md의 Phase 1→2→3→4→5 순서를 엄격히 따라 Next.js 16.3.6 스타터킷을 Notion CMS 블로그로 전환한다. 모든 작업은 shrimp-rules.md를 준수한다(await params, PageProps 전역 타입, error.tsx retry, Base UI render prop, Notion 서버 전용, Status=발행됨 필터, 한국어 주석·커밋, feature/ 브랜치, lint/typecheck/build 통과). 각 Phase 마지막 작업은 ROADMAP 완료 기준 확인 및 체크박스 갱신을 포함한다."
+    },
+    {
+      "id": "675ae6bd-5225-4182-a21d-6a52baf61c46",
+      "name": "[P2-1] 공통 타입 정의",
+      "description": "src/types/post.ts에 Post, PostDetail, Category 타입을 PRD 3.4절과 동일하게 정의한다.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "399f18ea-9fed-407c-8c63-80706f2a4b70"
+        }
+      ],
+      "createdAt": "2026-10-10T09:28:08.575Z",
+      "updatedAt": "2026-10-10T09:28:08.575Z",
+      "relatedFiles": [
+        {
+          "path": "src/types/post.ts",
+          "type": "CREATE",
+          "description": "공통 타입"
+        },
+        {
+          "path": "docs/PRD.md",
+          "type": "REFERENCE",
+          "description": "3.4절 데이터 모델",
+          "lineStart": 96,
+          "lineEnd": 115
+        }
+      ],
+      "implementationGuide": "export interface Post { id; slug; title; category; tags: string[]; publishedAt: string(ISO); description?: string }\\nexport interface PostDetail extends Post { content: string }\\nexport interface Category { name: string; count: number }\\n각 타입 위에 한국어 주석",
+      "verificationCriteria": "타입이 PRD 3.4절과 일치. any 없음. typecheck 통과.",
+      "analysisResult": "docs/ROADMAP.md의 Phase 1→2→3→4→5 순서를 엄격히 따라 Next.js 16.3.6 스타터킷을 Notion CMS 블로그로 전환한다. 모든 작업은 shrimp-rules.md를 준수한다(await params, PageProps 전역 타입, error.tsx retry, Base UI render prop, Notion 서버 전용, Status=발행됨 필터, 한국어 주석·커밋, feature/ 브랜치, lint/typecheck/build 통과). 각 Phase 마지막 작업은 ROADMAP 완료 기준 확인 및 체크박스 갱신을 포함한다."
+    },
+    {
+      "id": "d4d90bc1-5ab0-4547-a194-48c4cde1af4a",
+      "name": "[P2-2] Notion 조회 함수 구현",
+      "description": "src/lib/notion.ts에 페이지 조회, 매퍼, 본문 변환, 상위 조회 함수를 구현한다. 모든 함수 반환값은 공통 타입으로 지정한다.",
+      "notes": "초안 글은 어떤 함수로도 반환되면 안 된다. 설치된 SDK 버전의 쿼리 API를 먼저 확인.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "675ae6bd-5225-4182-a21d-6a52baf61c46"
+        }
+      ],
+      "createdAt": "2026-10-10T09:28:08.575Z",
+      "updatedAt": "2026-10-10T09:28:08.575Z",
+      "relatedFiles": [
+        {
+          "path": "src/lib/notion.ts",
+          "type": "TO_MODIFY",
+          "description": "조회 함수"
+        },
+        {
+          "path": "src/types/post.ts",
+          "type": "DEPENDENCY",
+          "description": "반환 타입"
+        }
+      ],
+      "implementationGuide": "fetchPages(): Promise<PageObjectResponse[]> — filter Status select equals '발행됨', sorts Published descending, do { query({start_cursor}) } while(has_more)\\nmapPageToPost(page): Post — 속성 타입 가드로 추출, Slug 없으면 page.id\\nfetchPageContent(pageId): Promise<string> — notion-to-md pageToMarkdown + toMarkdownString (하위 블록 재귀 포함)\\nwithRetry(fn, retries=3) — 429/5xx 시 지수 백오프\\ngetPublishedPosts(): Promise<Post[]>\\ngetPostBySlug(slug): Promise<PostDetail | null> — 발행됨 목록에서 slug 매칭, 없으면 null\\ngetPostsByCategory(category): Promise<Post[]>\\ngetCategories(): Promise<Category[]> — 글 개수 집계\\n중복 요청 제거를 위해 React cache()로 getPublishedPosts 감싸기",
+      "verificationCriteria": "발행됨 글만 최신순 반환, 초안 미포함. fetchPageContent가 샘플 글 Markdown 반환. 페이지네이션 루프 존재. any 미사용. typecheck 통과.",
+      "analysisResult": "docs/ROADMAP.md의 Phase 1→2→3→4→5 순서를 엄격히 따라 Next.js 16.3.6 스타터킷을 Notion CMS 블로그로 전환한다. 모든 작업은 shrimp-rules.md를 준수한다(await params, PageProps 전역 타입, error.tsx retry, Base UI render prop, Notion 서버 전용, Status=발행됨 필터, 한국어 주석·커밋, feature/ 브랜치, lint/typecheck/build 통과). 각 Phase 마지막 작업은 ROADMAP 완료 기준 확인 및 체크박스 갱신을 포함한다."
+    },
+    {
+      "id": "8c80f7f5-2bc8-40c9-8a7a-c241e81289f9",
+      "name": "[P2-3] 공통 컴포넌트 및 Phase 2 검증",
+      "description": "헤더·푸터를 블로그용으로 확장하고 PostCard를 만든다. 목업 데이터로 라이트/다크 표시를 확인하고 Phase 2를 검증한다.",
+      "notes": "하드코딩 색상 금지, 토큰 클래스만 사용.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "d4d90bc1-5ab0-4547-a194-48c4cde1af4a"
+        }
+      ],
+      "createdAt": "2026-10-10T09:28:08.575Z",
+      "updatedAt": "2026-10-10T09:28:08.575Z",
+      "relatedFiles": [
+        {
+          "path": "src/components/layout/site-header.tsx",
+          "type": "TO_MODIFY",
+          "description": "헤더"
+        },
+        {
+          "path": "src/components/layout/site-footer.tsx",
+          "type": "TO_MODIFY",
+          "description": "푸터"
+        },
+        {
+          "path": "src/components/blog/post-card.tsx",
+          "type": "CREATE",
+          "description": "글 카드"
+        },
+        {
+          "path": "src/components/ui/card.tsx",
+          "type": "DEPENDENCY",
+          "description": "Card"
+        },
+        {
+          "path": "src/components/ui/badge.tsx",
+          "type": "DEPENDENCY",
+          "description": "Badge"
+        }
+      ],
+      "implementationGuide": "1. site-header.tsx: 로고, mainNav, 테마 토글, 모바일 내비 유지(검색 진입점 자리 확보)\\n2. site-footer.tsx: 블로그 문구\\n3. src/components/blog/post-card.tsx: props { post: Post }; Card + Badge(카테고리), 제목, description, 태그 Badge(outline), <time dateTime> 발행일(ko-KR 포맷); 전체를 Link(/posts/{slug})로 감쌈\\n4. 목업 Post 배열로 홈에 임시 렌더링해 확인 후 제거\\n5. lint/typecheck/build, ROADMAP Phase 2 체크박스 갱신",
+      "verificationCriteria": "PostCard가 라이트/다크 모두 정상 표시. lint/typecheck/build 통과. ROADMAP Phase 2 완료 기준 충족.",
+      "analysisResult": "docs/ROADMAP.md의 Phase 1→2→3→4→5 순서를 엄격히 따라 Next.js 16.3.6 스타터킷을 Notion CMS 블로그로 전환한다. 모든 작업은 shrimp-rules.md를 준수한다(await params, PageProps 전역 타입, error.tsx retry, Base UI render prop, Notion 서버 전용, Status=발행됨 필터, 한국어 주석·커밋, feature/ 브랜치, lint/typecheck/build 통과). 각 Phase 마지막 작업은 ROADMAP 완료 기준 확인 및 체크박스 갱신을 포함한다."
+    },
+    {
+      "id": "83904d48-42db-4f47-88eb-60b0392fd890",
+      "name": "[P3-1] 블로그 글 목록 홈 페이지",
+      "description": "홈(/)을 서버 컴포넌트로 구현해 getPublishedPosts()로 발행 글을 최신순 카드 그리드로 표시한다.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "8c80f7f5-2bc8-40c9-8a7a-c241e81289f9"
+        }
+      ],
+      "createdAt": "2026-10-10T09:28:08.575Z",
+      "updatedAt": "2026-10-10T09:28:08.575Z",
+      "relatedFiles": [
+        {
+          "path": "src/components/blog/post-list.tsx",
+          "type": "CREATE",
+          "description": "글 목록"
+        },
+        {
+          "path": "src/app/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "홈"
+        },
+        {
+          "path": "src/lib/notion.ts",
+          "type": "DEPENDENCY",
+          "description": "getPublishedPosts"
+        }
+      ],
+      "implementationGuide": "1. src/components/blog/post-list.tsx: props { posts: Post[] }; grid gap-4 sm:grid-cols-2 lg:grid-cols-3; 빈 배열이면 '아직 발행된 글이 없습니다' 안내\\n2. src/app/page.tsx: export const revalidate = 3600; async HomePage → posts = await getPublishedPosts(); Hero 소개 + PostList",
+      "verificationCriteria": "홈에 발행됨 글만 최신순 표시(PRD F1). 모바일 1열/데스크톱 2~3열. 빈 상태 문구 표시.",
+      "analysisResult": "docs/ROADMAP.md의 Phase 1→2→3→4→5 순서를 엄격히 따라 Next.js 16.3.6 스타터킷을 Notion CMS 블로그로 전환한다. 모든 작업은 shrimp-rules.md를 준수한다(await params, PageProps 전역 타입, error.tsx retry, Base UI render prop, Notion 서버 전용, Status=발행됨 필터, 한국어 주석·커밋, feature/ 브랜치, lint/typecheck/build 통과). 각 Phase 마지막 작업은 ROADMAP 완료 기준 확인 및 체크박스 갱신을 포함한다."
+    },
+    {
+      "id": "c2f45d13-6f5e-4a51-885b-5ce630229a68",
+      "name": "[P3-2] 블로그 글 상세 페이지",
+      "description": "/posts/[slug] 상세 페이지를 정적 생성 + ISR로 구현한다.",
+      "notes": "Next.js 16 문서(node_modules/next/dist/docs/01-app/03-api-reference/03-file-conventions/dynamic-routes.md) 확인 후 작성.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "83904d48-42db-4f47-88eb-60b0392fd890"
+        }
+      ],
+      "createdAt": "2026-10-10T09:28:08.575Z",
+      "updatedAt": "2026-10-10T09:28:08.575Z",
+      "relatedFiles": [
+        {
+          "path": "src/app/posts/[slug]/page.tsx",
+          "type": "CREATE",
+          "description": "상세 페이지"
+        },
+        {
+          "path": "src/app/not-found.tsx",
+          "type": "REFERENCE",
+          "description": "404"
+        }
+      ],
+      "implementationGuide": "src/app/posts/[slug]/page.tsx\\nexport const revalidate = 3600\\nexport async function generateStaticParams() → (await getPublishedPosts()).map(p => ({ slug: p.slug }))\\nexport default async function PostPage(props: PageProps<'/posts/[slug]'>) { const { slug } = await props.params; const post = await getPostBySlug(slug); if (!post) notFound(); }\\n상단: 카테고리 Badge, h1 제목, time 발행일, 태그; 본문 자리(P3-3의 PostContent); 하단 '목록으로 돌아가기' Link\\n<article> 시맨틱 사용",
+      "verificationCriteria": "카드 클릭 시 상세 이동. 없는 글·초안 슬러그 접근 시 404. typecheck 통과.",
+      "analysisResult": "docs/ROADMAP.md의 Phase 1→2→3→4→5 순서를 엄격히 따라 Next.js 16.3.6 스타터킷을 Notion CMS 블로그로 전환한다. 모든 작업은 shrimp-rules.md를 준수한다(await params, PageProps 전역 타입, error.tsx retry, Base UI render prop, Notion 서버 전용, Status=발행됨 필터, 한국어 주석·커밋, feature/ 브랜치, lint/typecheck/build 통과). 각 Phase 마지막 작업은 ROADMAP 완료 기준 확인 및 체크박스 갱신을 포함한다."
+    },
+    {
+      "id": "a567d834-1d98-4165-baed-38e19875fe33",
+      "name": "[P3-3] Notion 본문 렌더링 및 Phase 3 검증",
+      "description": "Markdown 렌더러를 확정하고 post-content.tsx로 PRD F2의 10종 블록을 렌더링한다. 본문 타이포그래피와 구문 강조를 적용하고 Phase 3을 검증한다.",
+      "notes": "dangerouslySetInnerHTML로 원시 HTML 주입 금지(rehype-raw 사용 시 sanitize 필수).",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "c2f45d13-6f5e-4a51-885b-5ce630229a68"
+        }
+      ],
+      "createdAt": "2026-10-10T09:28:08.575Z",
+      "updatedAt": "2026-10-10T09:28:08.575Z",
+      "relatedFiles": [
+        {
+          "path": "src/components/blog/post-content.tsx",
+          "type": "CREATE",
+          "description": "본문 렌더러"
+        },
+        {
+          "path": "src/app/posts/[slug]/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "본문 연결"
+        },
+        {
+          "path": "src/app/globals.css",
+          "type": "TO_MODIFY",
+          "description": "본문/코드 스타일"
+        },
+        {
+          "path": "docs/PRD.md",
+          "type": "TO_MODIFY",
+          "description": "렌더러 확정 기록"
+        }
+      ],
+      "implementationGuide": "1. 렌더러 선정: react-markdown + remark-gfm(표·링크) + 구문 강조(rehype-pretty-code/shiki 또는 rehype-highlight) 중 서버 컴포넌트 호환 여부 확인 후 확정, PRD 2장 표 갱신\\n2. src/components/blog/post-content.tsx(서버 컴포넌트): props { content: string }; 문단, H1~H3, 목록, 코드, 인용, 콜아웃(notion-to-md 출력 형태 확인 후 처리), 이미지, 구분선, 링크, 표\\n3. 타이포그래피: max-w-3xl, 줄 간격, 다크 모드 토큰 색상; 코드·표는 overflow-x-auto (@tailwindcss/typography 도입 여부 결정)\\n4. 미지원 블록은 notion-to-md 커스텀 트랜스포머로 생략 + console.warn\\n5. 상세 페이지에 연결, lint/typecheck/build, 빌드 결과에서 / 와 /posts/[slug]가 ISR(●/○)로 표시되는지 확인, ROADMAP Phase 3 체크박스 갱신",
+      "verificationCriteria": "10종 블록 정상 렌더링(PRD F2). 코드 구문 강조. 빌드에서 홈·상세가 정적 생성(ISR). lint/typecheck/build 통과.",
+      "analysisResult": "docs/ROADMAP.md의 Phase 1→2→3→4→5 순서를 엄격히 따라 Next.js 16.3.6 스타터킷을 Notion CMS 블로그로 전환한다. 모든 작업은 shrimp-rules.md를 준수한다(await params, PageProps 전역 타입, error.tsx retry, Base UI render prop, Notion 서버 전용, Status=발행됨 필터, 한국어 주석·커밋, feature/ 브랜치, lint/typecheck/build 통과). 각 Phase 마지막 작업은 ROADMAP 완료 기준 확인 및 체크박스 갱신을 포함한다."
+    },
+    {
+      "id": "c94cd2b1-c303-4d4a-a921-85444d1787d7",
+      "name": "[P4-1] 카테고리 필터링",
+      "description": "category-filter 컴포넌트와 /category/[category] 페이지를 구현한다(PRD F3).",
+      "notes": "한글 카테고리명 인코딩: generateStaticParams가 반환하는 값과 params 수신 값의 인코딩 상태를 Next 16 문서로 확인.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "a567d834-1d98-4165-baed-38e19875fe33"
+        }
+      ],
+      "createdAt": "2026-10-10T09:28:34.234Z",
+      "updatedAt": "2026-10-10T09:28:34.234Z",
+      "relatedFiles": [
+        {
+          "path": "src/components/blog/category-filter.tsx",
+          "type": "CREATE",
+          "description": "카테고리 필터"
+        },
+        {
+          "path": "src/app/category/[category]/page.tsx",
+          "type": "CREATE",
+          "description": "카테고리 페이지"
+        },
+        {
+          "path": "src/app/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "필터 배치"
+        }
+      ],
+      "implementationGuide": "1. src/components/blog/category-filter.tsx: props { categories: Category[]; activeCategory?: string }; Badge 링크 목록('전체' + 카테고리명(개수)); href=/category/{encodeURIComponent(name)}\\n2. 홈과 카테고리 페이지에 배치\\n3. src/app/category/[category]/page.tsx: revalidate=3600; generateStaticParams → getCategories(); const { category } = await params; decodeURIComponent; 없으면 notFound(); getPostsByCategory → PostList 재사용; 카테고리명·글 개수 표시",
+      "verificationCriteria": "카테고리 선택 시 해당 발행 글만 표시. 한글 카테고리 정상 동작. 없는 카테고리 404."
+    },
+    {
+      "id": "18e1ceb0-3969-41f3-be08-eb054b0b7abc",
+      "name": "[P4-2] 클라이언트 검색 기능",
+      "description": "제목·요약·태그 대상 클라이언트 필터링 검색을 구현하고 검색어를 ?q=로 동기화한다(PRD F4). Notion API 추가 호출 없음.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "c94cd2b1-c303-4d4a-a921-85444d1787d7"
+        }
+      ],
+      "createdAt": "2026-10-10T09:28:34.234Z",
+      "updatedAt": "2026-10-10T09:28:34.234Z",
+      "relatedFiles": [
+        {
+          "path": "src/components/blog/search-input.tsx",
+          "type": "CREATE",
+          "description": "검색 입력"
+        },
+        {
+          "path": "src/app/search/page.tsx",
+          "type": "CREATE",
+          "description": "검색 페이지"
+        },
+        {
+          "path": "src/config/site.ts",
+          "type": "TO_MODIFY",
+          "description": "검색 진입점"
+        }
+      ],
+      "implementationGuide": "1. src/components/blog/search-input.tsx('use client'): Input; useSearchParams로 q 읽기; 입력 시 router.replace(`?q=${encodeURIComponent(v)}`)\\n2. 필터 함수 filterPosts(posts, query): Post[] — 소문자 비교, title/description/tags 포함 여부\\n3. src/app/search/page.tsx(또는 홈 내 검색): 서버에서 getPublishedPosts() 후 클라이언트 결과 컴포넌트에 props 전달; useSearchParams 사용 컴포넌트를 <Suspense>로 감싸기\\n4. 결과 없음 안내 문구\\n5. site.ts mainNav 또는 헤더에 검색 진입점 추가",
+      "verificationCriteria": "일치 글만 표시, 결과 없음 안내. 새로고침·뒤로 가기 후 동일 결과. build에서 정적 렌더링 유지."
+    },
+    {
+      "id": "33b5d5ce-b154-407c-8cc0-e6fdb283db23",
+      "name": "[P4-3] SEO 최적화 및 Phase 4 검증",
+      "description": "루트·페이지별 메타데이터, sitemap, robots를 추가하고 시맨틱 HTML을 점검한다. Phase 4를 검증한다.",
+      "notes": "metadata 파일 규칙은 node_modules/next/dist/docs/01-app/03-api-reference/03-file-conventions/01-metadata 확인.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "18e1ceb0-3969-41f3-be08-eb054b0b7abc"
+        }
+      ],
+      "createdAt": "2026-10-10T09:28:34.234Z",
+      "updatedAt": "2026-10-10T09:28:34.234Z",
+      "relatedFiles": [
+        {
+          "path": "src/app/layout.tsx",
+          "type": "TO_MODIFY",
+          "description": "기본 메타데이터"
+        },
+        {
+          "path": "src/app/posts/[slug]/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "generateMetadata"
+        },
+        {
+          "path": "src/app/sitemap.ts",
+          "type": "CREATE",
+          "description": "sitemap"
+        },
+        {
+          "path": "src/app/robots.ts",
+          "type": "CREATE",
+          "description": "robots"
+        }
+      ],
+      "implementationGuide": "1. layout.tsx metadata에 openGraph 기본값 추가(title template은 이미 있음)\\n2. posts/[slug] generateMetadata(props: PageProps) → await params; title, description, openGraph(type article, publishedTime)\\n3. src/app/sitemap.ts: siteConfig.url 기준 홈 + 발행 글 + 카테고리\\n4. src/app/robots.ts: sitemap URL 포함\\n5. article/time/제목 계층 점검\\n6. lint/typecheck/build, ROADMAP Phase 4 체크박스 갱신",
+      "verificationCriteria": "상세 페이지별 title/description/og 다름. /sitemap.xml, /robots.txt 응답, 초안 미포함. lint/typecheck/build 통과."
+    },
+    {
+      "id": "3bfb4e98-ba06-4b0e-9a45-7248743f269a",
+      "name": "[P5-1] 성능 최적화",
+      "description": "Lighthouse 측정 후 병목을 개선하고 Notion 이미지 URL 만료(약 1시간)에 대응한다.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "33b5d5ce-b154-407c-8cc0-e6fdb283db23"
+        }
+      ],
+      "createdAt": "2026-10-10T09:28:34.235Z",
+      "updatedAt": "2026-10-10T09:28:34.235Z",
+      "relatedFiles": [
+        {
+          "path": "next.config.ts",
+          "type": "TO_MODIFY",
+          "description": "remotePatterns"
+        },
+        {
+          "path": "src/components/blog/post-content.tsx",
+          "type": "TO_MODIFY",
+          "description": "이미지 렌더링"
+        }
+      ],
+      "implementationGuide": "1. npm run build && npm start 후 Lighthouse(또는 playwright) 측정, LCP 2.5초 이하 목표\\n2. 이미지: next/image 적용 가능성 검토, next.config.ts images.remotePatterns에 Notion S3 도메인 추가; 만료 대응(revalidate 3600 이하 유지 또는 이미지 프록시 Route Handler 검토)\\n3. 불필요한 'use client' 제거, 번들 크기 점검",
+      "verificationCriteria": "Lighthouse 성능 90 이상. 1시간 경과 후에도 이미지 표시 전략 확정."
+    },
+    {
+      "id": "c944e40b-b89d-4783-8b93-b3b276fd2475",
+      "name": "[P5-2] 반응형 및 접근성 개선",
+      "description": "360/640/1024/1440px 레이아웃, 모바일 내비 키보드 접근성, 코드·표 가로 스크롤, 라이트/다크 색 대비를 점검·수정한다.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "3bfb4e98-ba06-4b0e-9a45-7248743f269a"
+        }
+      ],
+      "createdAt": "2026-10-10T09:28:34.235Z",
+      "updatedAt": "2026-10-10T09:28:34.235Z",
+      "relatedFiles": [
+        {
+          "path": "src/components/layout/mobile-nav.tsx",
+          "type": "REFERENCE",
+          "description": "모바일 내비"
+        },
+        {
+          "path": "src/app/globals.css",
+          "type": "TO_MODIFY",
+          "description": "스타일 보정"
+        }
+      ],
+      "implementationGuide": "1. playwright로 4개 너비 스크린샷 비교\\n2. Sheet 내비 Tab/Esc 동작 확인\\n3. 코드 블록·표 overflow-x-auto 확인\\n4. Lighthouse 접근성·SEO 90 이상 확인",
+      "verificationCriteria": "360~1440px 레이아웃 깨짐 없음(PRD F5). Lighthouse 접근성·SEO 각 90 이상."
+    },
+    {
+      "id": "c3f66750-3a19-47fa-8775-55ae910acd45",
+      "name": "[P5-3] Vercel 배포 및 문서화",
+      "description": "Vercel에 배포하고 README를 정리한다. GitHub·Vercel 연결과 환경 변수 등록은 사용자가 수행한다.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "c944e40b-b89d-4783-8b93-b3b276fd2475"
+        }
+      ],
+      "createdAt": "2026-10-10T09:28:34.235Z",
+      "updatedAt": "2026-10-10T09:28:34.235Z",
+      "relatedFiles": [
+        {
+          "path": "README.md",
+          "type": "TO_MODIFY",
+          "description": "문서"
+        },
+        {
+          "path": "docs/ROADMAP.md",
+          "type": "TO_MODIFY",
+          "description": "체크박스"
+        }
+      ],
+      "implementationGuide": "1. README.md에 실행 방법, 환경 변수, Notion DB 구조, 배포 절차를 한국어로 정리\\n2. 사용자 안내: GitHub 저장소 연결, Vercel Environment Variables에 NOTION_API_KEY/NOTION_DATABASE_ID/NEXT_PUBLIC_SITE_URL 등록, 배포\\n3. 배포 후 홈·상세·카테고리·검색 동작, 새 글 1시간 내 반영, 번들·응답에 API 키 미노출 확인\\n4. ROADMAP Phase 5 체크박스 갱신",
+      "verificationCriteria": "프로덕션 URL에서 전 기능 정상. API 키 미노출. README 갱신. ROADMAP Phase 5 완료 기준 충족."
+    }
+  ]
+}
